@@ -40,6 +40,7 @@
             // 
             // GridView
             // 
+            GridView.AllowUserToOrderColumns = true;
             GridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             GridView.Location = new Point(159, 12);
             GridView.Name = "GridView";

@@ -18,6 +18,7 @@ namespace ErakGiyim
         public CreateProductForm()
         {
             InitializeComponent();
+            LoadSizesAndColors();
         }
 
         public CreateProductForm(Product product) : this()
@@ -29,7 +30,6 @@ namespace ErakGiyim
             // If a product is passed, populate the form fields with its data
             if (product != null)
             {
-                LoadSizesAndColors();
                 ProductNameTextBox.Text = product.ProductName;
                 PriceTextBox.Text = product.Price.ToString("F2");
                 AmountInStockTextBox.Text = product.AmountInStock.ToString();
@@ -44,8 +44,6 @@ namespace ErakGiyim
 
         private void CreateForm_Load(object sender, EventArgs e)
         {
-            // Load sizes and colors into the ComboBoxes
-            LoadSizesAndColors();
         }
 
         private void LoadSizesAndColors()
