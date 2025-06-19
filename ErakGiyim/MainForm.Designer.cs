@@ -46,6 +46,7 @@
             GridView.Name = "GridView";
             GridView.Size = new Size(728, 498);
             GridView.TabIndex = 0;
+            GridView.ColumnHeaderMouseClick += GridView_ColumnHeaderMouseClick;
             // 
             // Create
             // 
@@ -53,7 +54,7 @@
             Create.Name = "Create";
             Create.Size = new Size(141, 54);
             Create.TabIndex = 1;
-            Create.Text = "Create";
+            Create.Text = "Add";
             Create.UseVisualStyleBackColor = true;
             Create.Click += Create_Click;
             // 

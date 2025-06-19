@@ -42,10 +42,6 @@ namespace ErakGiyim
             }
         }
 
-        private void CreateForm_Load(object sender, EventArgs e)
-        {
-        }
-
         private void LoadSizesAndColors()
         {
             // Load sizes and colors into the ComboBoxes
@@ -135,7 +131,7 @@ namespace ErakGiyim
                 {
                     context.Products.Add(newProduct);
                     context.SaveChanges();
-                    MessageBox.Show("Product created successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Product added successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             catch (Exception ex)

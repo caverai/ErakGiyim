@@ -48,7 +48,7 @@
             CreateButton.Name = "CreateButton";
             CreateButton.Size = new Size(106, 53);
             CreateButton.TabIndex = 0;
-            CreateButton.Text = "Create";
+            CreateButton.Text = "Add";
             CreateButton.UseVisualStyleBackColor = true;
             CreateButton.Click += CreateButton_Click;
             // 
@@ -162,8 +162,7 @@
             Controls.Add(CancelButton);
             Controls.Add(CreateButton);
             Name = "CreateProductForm";
-            Text = "Create Product";
-            Load += CreateForm_Load;
+            Text = "Add Product";
             ResumeLayout(false);
             PerformLayout();
         }
