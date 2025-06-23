@@ -40,11 +40,13 @@
             ColorLabel = new Label();
             SizeComboBox = new ComboBox();
             ColorComboBox = new ComboBox();
+            StorageComboBox = new ComboBox();
+            StorageLabel = new Label();
             SuspendLayout();
             // 
             // CreateButton
             // 
-            CreateButton.Location = new Point(120, 176);
+            CreateButton.Location = new Point(120, 209);
             CreateButton.Name = "CreateButton";
             CreateButton.Size = new Size(106, 53);
             CreateButton.TabIndex = 0;
@@ -54,7 +56,7 @@
             // 
             // CancelButton
             // 
-            CancelButton.Location = new Point(232, 176);
+            CancelButton.Location = new Point(232, 209);
             CancelButton.Name = "CancelButton";
             CancelButton.Size = new Size(106, 53);
             CancelButton.TabIndex = 1;
@@ -144,11 +146,30 @@
             ColorComboBox.Size = new Size(218, 23);
             ColorComboBox.TabIndex = 13;
             // 
+            // StorageComboBox
+            // 
+            StorageComboBox.FormattingEnabled = true;
+            StorageComboBox.Location = new Point(120, 160);
+            StorageComboBox.Name = "StorageComboBox";
+            StorageComboBox.Size = new Size(218, 23);
+            StorageComboBox.TabIndex = 14;
+            // 
+            // StorageLabel
+            // 
+            StorageLabel.AutoSize = true;
+            StorageLabel.Location = new Point(12, 163);
+            StorageLabel.Name = "StorageLabel";
+            StorageLabel.Size = new Size(47, 15);
+            StorageLabel.TabIndex = 15;
+            StorageLabel.Text = "Storage";
+            // 
             // CreateProductForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(350, 241);
+            ClientSize = new Size(350, 274);
+            Controls.Add(StorageLabel);
+            Controls.Add(StorageComboBox);
             Controls.Add(ColorComboBox);
             Controls.Add(SizeComboBox);
             Controls.Add(ColorLabel);
@@ -181,5 +202,7 @@
         private Label ColorLabel;
         private ComboBox SizeComboBox;
         private ComboBox ColorComboBox;
+        private ComboBox StorageComboBox;
+        private Label StorageLabel;
     }
 }

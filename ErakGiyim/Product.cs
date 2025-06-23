@@ -18,5 +18,13 @@ namespace ErakGiyim
         public int AmountInStock { get; set; }
         public string Size { get; set; }
         public string Color { get; set; }
+
+        public int? StorageId { get; set; }
+        public Storage? Storage { get; set; }
+
+        [NotMapped]
+        public string StorageName => Storage?.StorageName ?? "";
+
+        public List<OrderDetail> OrderDetails { get; set; }
     }
 }

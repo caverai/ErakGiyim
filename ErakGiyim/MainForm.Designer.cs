@@ -35,6 +35,11 @@
             Refresh = new Button();
             Exit = new Button();
             TableBox = new ComboBox();
+            ViewStorageButton = new Button();
+            TotalSaleLabel = new Label();
+            TotalPurchaseLabel = new Label();
+            TotalPurchaseDisplay = new Label();
+            TotalSaleDisplay = new Label();
             ((System.ComponentModel.ISupportInitialize)GridView).BeginInit();
             SuspendLayout();
             // 
@@ -107,11 +112,61 @@
             TableBox.TabIndex = 6;
             TableBox.SelectedIndexChanged += TableBox_SelectedIndexChanged;
             // 
+            // ViewStorageButton
+            // 
+            ViewStorageButton.Location = new Point(12, 156);
+            ViewStorageButton.Name = "ViewStorageButton";
+            ViewStorageButton.Size = new Size(141, 54);
+            ViewStorageButton.TabIndex = 7;
+            ViewStorageButton.Text = "View Storage";
+            ViewStorageButton.UseVisualStyleBackColor = true;
+            ViewStorageButton.Click += ViewStorageButton_Click;
+            // 
+            // TotalSaleLabel
+            // 
+            TotalSaleLabel.AutoSize = true;
+            TotalSaleLabel.Location = new Point(-1, 138);
+            TotalSaleLabel.Name = "TotalSaleLabel";
+            TotalSaleLabel.Size = new Size(60, 15);
+            TotalSaleLabel.TabIndex = 8;
+            TotalSaleLabel.Text = "Total Sale:";
+            TotalSaleLabel.Click += TotalSaleLabel_Click;
+            // 
+            // TotalPurchaseLabel
+            // 
+            TotalPurchaseLabel.AutoSize = true;
+            TotalPurchaseLabel.Location = new Point(-1, 123);
+            TotalPurchaseLabel.Name = "TotalPurchaseLabel";
+            TotalPurchaseLabel.Size = new Size(87, 15);
+            TotalPurchaseLabel.TabIndex = 9;
+            TotalPurchaseLabel.Text = "Total Purchase:";
+            // 
+            // TotalPurchaseDisplay
+            // 
+            TotalPurchaseDisplay.AutoSize = true;
+            TotalPurchaseDisplay.Location = new Point(86, 123);
+            TotalPurchaseDisplay.Name = "TotalPurchaseDisplay";
+            TotalPurchaseDisplay.Size = new Size(0, 15);
+            TotalPurchaseDisplay.TabIndex = 10;
+            // 
+            // TotalSaleDisplay
+            // 
+            TotalSaleDisplay.AutoSize = true;
+            TotalSaleDisplay.Location = new Point(59, 138);
+            TotalSaleDisplay.Name = "TotalSaleDisplay";
+            TotalSaleDisplay.Size = new Size(0, 15);
+            TotalSaleDisplay.TabIndex = 11;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(899, 522);
+            Controls.Add(TotalSaleDisplay);
+            Controls.Add(TotalPurchaseDisplay);
+            Controls.Add(TotalPurchaseLabel);
+            Controls.Add(TotalSaleLabel);
+            Controls.Add(ViewStorageButton);
             Controls.Add(TableBox);
             Controls.Add(Exit);
             Controls.Add(Refresh);
@@ -124,6 +179,7 @@
             Load += MainForm_Load;
             ((System.ComponentModel.ISupportInitialize)GridView).EndInit();
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -135,5 +191,10 @@
         private Button Refresh;
         private Button Exit;
         private ComboBox TableBox;
+        private Button ViewStorageButton;
+        private Label TotalSaleLabel;
+        private Label TotalPurchaseLabel;
+        private Label TotalPurchaseDisplay;
+        private Label TotalSaleDisplay;
     }
 }

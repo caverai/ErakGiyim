@@ -10,6 +10,10 @@ public class DenimContext : DbContext
 {
     public DbSet<Product> Products { get; set; }
     public DbSet<Customer> Customers { get; set; }
+    public DbSet<Order> Orders { get; set; }
+    public DbSet<OrderDetail> OrderDetails { get; set; }
+    public DbSet<Storage> Storages { get; set; }
+    public DbSet<Supplier> Suppliers { get; set; }
 
     // Set up your database connection here
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ErakGiyim.Migrations
 {
     [DbContext(typeof(DenimContext))]
-    partial class DenimContextModelSnapshot : ModelSnapshot
+    [Migration("20250623072047_newClassesAndDContextCorrected")]
+    partial class newClassesAndDContextCorrected
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -76,14 +79,14 @@ namespace ErakGiyim.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Paid")
-                        .HasColumnType("bit");
-
                     b.Property<int?>("SupplierId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("paid")
+                        .HasColumnType("bit");
 
                     b.HasKey("OrderId");
 
@@ -111,7 +114,7 @@ namespace ErakGiyim.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("UnitPrice")
+                    b.Property<decimal>("unitPrice")
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("OrderDetailId");

@@ -8,18 +8,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ErakGiyim
 {
-    public class Customer
+    public class Supplier
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int CustomerId { get; set; }
-        public string CustomerName { get; set; }
-        public string Email { get; set; }
+        public int SupplierId { get; set; }
+        public string SupplierName { get; set; }
         public string PhoneNumber { get; set; }
+        public string Email { get; set; }
         public string Address { get; set; }
         public string City { get; set; }
         public string Country { get; set; }
-
         public List<Order> Orders { get; set; }
     }
 }

@@ -19,6 +19,7 @@ namespace ErakGiyim
         {
             InitializeComponent();
             LoadSizesAndColors();
+            LoadStorages();
         }
 
         public CreateProductForm(Product product) : this()
@@ -49,6 +50,18 @@ namespace ErakGiyim
             ColorComboBox.Items.AddRange(new string[] { "Blue", "Black", "White", "Red", "Green" });
         }
 
+        private void LoadStorages()
+        {
+            // Load storage options into the StorageComboBox
+            using (var context = new DenimContext())
+            {
+                var storages = context.Storages.ToList();
+                StorageComboBox.DataSource = storages;
+                StorageComboBox.DisplayMember = "StorageName";
+                StorageComboBox.ValueMember = "StorageId";
+            }
+        }
+
         private void CreateButton_Click(object sender, EventArgs e)
         {
             // Validate inputs
@@ -56,7 +69,7 @@ namespace ErakGiyim
                 string.IsNullOrWhiteSpace(PriceTextBox.Text) ||
                 string.IsNullOrWhiteSpace(AmountInStockTextBox.Text) ||
                 SizeComboBox.SelectedItem == null ||
-                ColorComboBox.SelectedItem == null )
+                ColorComboBox.SelectedItem == null)
             {
                 MessageBox.Show("Please fill in all fields.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -71,16 +84,15 @@ namespace ErakGiyim
                 MessageBox.Show("Invalid stock amount.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            if (isUpdating) {
-                // If in update mode, update the existing product
+            if (isUpdating)
+            {
                 UpdateProduct(price, amountInStock);
             }
             else
             {
-                // Otherwise, create a new product
                 CreateNewProduct(price, amountInStock);
             }
-            this.Close(); // Close the form after creation
+            this.Close();
         }
 
         private void UpdateProduct(decimal price, int amountInStock)
@@ -98,6 +110,7 @@ namespace ErakGiyim
                         product.AmountInStock = amountInStock;
                         product.Size = SizeComboBox.SelectedItem.ToString();
                         product.Color = ColorComboBox.SelectedItem.ToString();
+                        product.StorageId = StorageComboBox.SelectedValue != null ? (int?)Convert.ToInt32(StorageComboBox.SelectedValue) : null;
                         context.SaveChanges();
                         MessageBox.Show("Product updated successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
@@ -122,7 +135,8 @@ namespace ErakGiyim
                 Price = price,
                 AmountInStock = amountInStock,
                 Size = SizeComboBox.SelectedItem.ToString(),
-                Color = ColorComboBox.SelectedItem.ToString()
+                Color = ColorComboBox.SelectedItem.ToString(),
+                StorageId = StorageComboBox.SelectedValue != null ? (int?)Convert.ToInt32(StorageComboBox.SelectedValue) : null
             };
             // Save the product to the database
             try
@@ -143,7 +157,7 @@ namespace ErakGiyim
 
         private void CancelButton_Click(object sender, EventArgs e)
         {
-            this.Close(); // Close the form without saving
+            this.Close();
         }
     }
 }
