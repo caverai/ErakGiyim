@@ -1,8 +1,10 @@
-using System.Linq;
-using System.Data.SqlClient;
-using System.Data.Common;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.Data.Common;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Text;
+using OfficeOpenXml;
 
 namespace ErakGiyim
 {
@@ -15,6 +17,7 @@ namespace ErakGiyim
         public MainForm()
         {
             InitializeComponent();
+            ExcelPackage.License.SetNonCommercialPersonal("My Name");
             TableBox.SelectedIndexChanged += TableBox_SelectedIndexChanged;
             using (var context = new DenimContext())
             {
@@ -25,7 +28,29 @@ namespace ErakGiyim
             TotalSaleDisplay.Visible = false;
             TotalSaleLabel.Visible = false;
             ViewStorageButton.Visible = false;
+            CancelOrderButton.Visible = false;
         }
+
+        private void GridView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            if (TableBox.SelectedItem == "Orders" && e.ColumnIndex == GridView.Columns["Paid"].Index)
+            {
+                var updatedOrder = GridView.Rows[e.RowIndex].DataBoundItem as Order;
+                if (updatedOrder == null)
+                    return; // skip if not a valid Order (e.g., new row)
+
+                using (var context = new DenimContext())
+                {
+                    var orderInDb = context.Orders.Find(updatedOrder.OrderId);
+                    if (orderInDb != null)
+                    {
+                        orderInDb.Paid = updatedOrder.Paid;
+                        context.SaveChanges();
+                    }
+                }
+            }
+        }
+
 
         private void LoadProducts()
         {
@@ -140,10 +165,17 @@ namespace ErakGiyim
                 GridView.Columns.Add(new DataGridViewCheckBoxColumn
                 {
                     DataPropertyName = "Paid",
-                    HeaderText = "Paid"
+                    HeaderText = "Paid",
+                    Name = "Paid"
+                });
+                GridView.Columns.Add(new DataGridViewTextBoxColumn
+                {
+                    DataPropertyName = "Status",
+                    HeaderText = "Status"
                 });
                 GridView.DataSource = orders;
             }
+            GridView.Columns["Paid"].ReadOnly = false;
             //Compute totals
             using (var context = new DenimContext())
             {
@@ -155,6 +187,14 @@ namespace ErakGiyim
                     .Where(o => o.OrderType == "Purchase")
                     .Sum(o => o.TotalAmount);
                 TotalPurchaseDisplay.Text = totalPurchases.ToString("C2");
+                var unpaidPurchases = context.Orders
+                    .Where(o => o.OrderType == "Purchase" && !o.Paid)
+                    .Sum(o => o.TotalAmount);
+                UnpaidPurchaseDisplay.Text = unpaidPurchases.ToString("C2");
+                var unpaidSales = context.Orders
+                    .Where(o => o.OrderType == "Sale" && !o.Paid)
+                    .Sum(o => o.TotalAmount);
+                UnpaidSaleDisplay.Text = unpaidSales.ToString("C2");
             }
         }
 
@@ -190,8 +230,21 @@ namespace ErakGiyim
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            LoadProducts();
             LoadTableNames();
+            TableBox.SelectedItem = "Orders";
+            LoadOrders();
+        }
+
+        private void OrdersOpened(bool opened)
+        {
+            TotalSaleDisplay.Visible = opened;
+            TotalSaleLabel.Visible = opened;
+            TotalPurchaseDisplay.Visible = opened;
+            TotalPurchaseLabel.Visible = opened;
+            UnpaidPurchaseDisplay.Visible = opened;
+            UnpaidPurchaseLabel.Visible = opened;
+            UnpaidSaleDisplay.Visible = opened;
+            UnpaidSaleLabel.Visible = opened;
         }
 
         private void TableBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -202,46 +255,36 @@ namespace ErakGiyim
             {
                 LoadProducts();
                 ViewStorageButton.Visible = false;
-                TotalSaleDisplay.Visible = false;
-                TotalSaleLabel.Visible = false;
-                TotalPurchaseDisplay.Visible = false;
-                TotalPurchaseLabel.Visible = false;
+                CancelOrderButton.Visible = false;
+                OrdersOpened(false);
             }
             else if (selectedTable == "Customers")
             {
                 LoadCustomers();
                 ViewStorageButton.Visible = false;
-                TotalSaleDisplay.Visible = false;
-                TotalSaleLabel.Visible = false;
-                TotalPurchaseDisplay.Visible = false;
-                TotalPurchaseLabel.Visible = false;
+                CancelOrderButton.Visible = false;
+                OrdersOpened(false);
             }
             else if (selectedTable == "Suppliers")
             {
                 LoadSuppliers();
                 ViewStorageButton.Visible = false;
-                TotalSaleDisplay.Visible = false;
-                TotalSaleLabel.Visible = false;
-                TotalPurchaseDisplay.Visible = false;
-                TotalPurchaseLabel.Visible = false;
+                CancelOrderButton.Visible = false;
+                OrdersOpened(false);
             }
             else if (selectedTable == "Orders")
             {
                 LoadOrders();
                 ViewStorageButton.Visible = false;
-                TotalSaleDisplay.Visible = true;
-                TotalSaleLabel.Visible = true;
-                TotalPurchaseDisplay.Visible = true;
-                TotalPurchaseLabel.Visible = true;
+                CancelOrderButton.Visible = true;
+                OrdersOpened(true);
             }
             else if (selectedTable == "Storage")
             {
                 LoadStorage();
                 ViewStorageButton.Visible = true;
-                TotalSaleDisplay.Visible = false;
-                TotalSaleLabel.Visible = false;
-                TotalPurchaseDisplay.Visible = false;
-                TotalPurchaseLabel.Visible = false;
+                CancelOrderButton.Visible = false;
+                OrdersOpened(false);
             }
             else
             {
@@ -324,6 +367,13 @@ namespace ErakGiyim
             {
                 var selectedOrder = (Order)GridView.SelectedRows[0].DataBoundItem;
 
+                // Check if the selected order is already Completed or Cancelled
+                if (selectedOrder.Status == "Completed" || selectedOrder.Status == "Cancelled")
+                {
+                    MessageBox.Show("Cannot update a completed or cancelled order.", "Update Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
                 // Fetch a fresh copy with OrderDetails, Customer, Supplier
                 using (var context = new DenimContext())
                 {
@@ -362,7 +412,7 @@ namespace ErakGiyim
         {
             if (GridView.SelectedRows.Count == 0)
             {
-                MessageBox.Show("Please select a product to delete.", "Delete Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Please select a row to delete.", "Delete Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -585,11 +635,10 @@ namespace ErakGiyim
                 {
                     var columnName = GridView.Columns[e.ColumnIndex].DataPropertyName;
 
-                    // Determine sort direction
                     bool ascending = true;
                     if (lastSortedColumn == columnName)
                     {
-                        ascending = !lastSortAscending; // toggle direction if same column
+                        ascending = !lastSortAscending;
                     }
                     lastSortedColumn = columnName;
                     lastSortAscending = ascending;
@@ -622,11 +671,10 @@ namespace ErakGiyim
             else if (GridView.DataSource is List<Customer> customers)
             {
                 var columnName = GridView.Columns[e.ColumnIndex].DataPropertyName;
-                // Determine sort direction
                 bool ascending = true;
                 if (lastSortedColumn == columnName)
                 {
-                    ascending = !lastSortAscending; // toggle direction if same column
+                    ascending = !lastSortAscending;
                 }
                 lastSortedColumn = columnName;
                 lastSortAscending = ascending;
@@ -637,6 +685,63 @@ namespace ErakGiyim
                         GridView.DataSource = customers.OrderBy(c => prop.GetValue(c, null)).ToList();
                     else
                         GridView.DataSource = customers.OrderByDescending(c => prop.GetValue(c, null)).ToList();
+                }
+            }
+            else if (GridView.DataSource is List<Supplier> suppliers)
+            {
+                var columnName = GridView.Columns[e.ColumnIndex].DataPropertyName;
+                bool ascending = true;
+                if (lastSortedColumn == columnName)
+                {
+                    ascending = !lastSortAscending;
+                }
+                lastSortedColumn = columnName;
+                lastSortAscending = ascending;
+                var prop = typeof(Supplier).GetProperty(columnName);
+                if (prop != null)
+                {
+                    if (ascending)
+                        GridView.DataSource = suppliers.OrderBy(s => prop.GetValue(s, null)).ToList();
+                    else
+                        GridView.DataSource = suppliers.OrderByDescending(s => prop.GetValue(s, null)).ToList();
+                }
+            }
+            else if (GridView.DataSource is List<Order> orders)
+            {
+                var columnName = GridView.Columns[e.ColumnIndex].DataPropertyName;
+                bool ascending = true;
+                if (lastSortedColumn == columnName)
+                {
+                    ascending = !lastSortAscending;
+                }
+                lastSortedColumn = columnName;
+                lastSortAscending = ascending;
+                var prop = typeof(Order).GetProperty(columnName);
+                if (prop != null)
+                {
+                    if (ascending)
+                        GridView.DataSource = orders.OrderBy(o => prop.GetValue(o, null)).ToList();
+                    else
+                        GridView.DataSource = orders.OrderByDescending(o => prop.GetValue(o, null)).ToList();
+                }
+            }
+            else if (GridView.DataSource is List<Storage> storages)
+            {
+                var columnName = GridView.Columns[e.ColumnIndex].DataPropertyName;
+                bool ascending = true;
+                if (lastSortedColumn == columnName)
+                {
+                    ascending = !lastSortAscending;
+                }
+                lastSortedColumn = columnName;
+                lastSortAscending = ascending;
+                var prop = typeof(Storage).GetProperty(columnName);
+                if (prop != null)
+                {
+                    if (ascending)
+                        GridView.DataSource = storages.OrderBy(s => prop.GetValue(s, null)).ToList();
+                    else
+                        GridView.DataSource = storages.OrderByDescending(s => prop.GetValue(s, null)).ToList();
                 }
             }
         }
@@ -653,9 +758,142 @@ namespace ErakGiyim
             viewStorageForm.ShowDialog();
         }
 
-        private void TotalSaleLabel_Click(object sender, EventArgs e)
+        private void ExportButton_Click(object sender, EventArgs e)
         {
+            if (GridView.Rows.Count == 0)
+            {
+                MessageBox.Show("There is no data to export.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
 
+            using (SaveFileDialog sfd = new SaveFileDialog())
+            {
+                // Save as CSV or XLSX
+                sfd.Filter = "CSV Files (*.csv)|*.csv|Excel Files (*.xlsx)|*.xlsx";
+                sfd.FileName = "ExportedData_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".csv";
+                sfd.DefaultExt = "csv";
+                sfd.Title = "Export Data";
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        if (sfd.FilterIndex == 1) // CSV
+                        {
+                            using (var sw = new StreamWriter(sfd.FileName, false, Encoding.UTF8))
+                            {
+                                // Write headers
+                                for (int i = 0; i < GridView.Columns.Count; i++)
+                                {
+                                    sw.Write(GridView.Columns[i].HeaderText);
+                                    if (i < GridView.Columns.Count - 1)
+                                        sw.Write(",");
+                                }
+                                sw.WriteLine();
+                                // Write rows
+                                foreach (DataGridViewRow row in GridView.Rows)
+                                {
+                                    if (!row.IsNewRow)
+                                    {
+                                        for (int i = 0; i < GridView.Columns.Count; i++)
+                                        {
+                                            var value = row.Cells[i].Value?.ToString() ?? "";
+                                            // Escape if needed
+                                            if (value.Contains(",") || value.Contains("\""))
+                                                value = $"\"{value.Replace("\"", "\"\"")}\"";
+                                            sw.Write(value);
+                                            if (i < GridView.Columns.Count - 1)
+                                                sw.Write(",");
+                                        }
+                                        sw.WriteLine();
+                                    }
+                                }
+                            }
+                        }
+                        else if (sfd.FilterIndex == 2) // XLSX
+                        {
+                            using (var package = new ExcelPackage())
+                            {
+                                var worksheet = package.Workbook.Worksheets.Add("Data");
+
+                                // Write headers
+                                for (int i = 0; i < GridView.Columns.Count; i++)
+                                {
+                                    worksheet.Cells[1, i + 1].Value = GridView.Columns[i].HeaderText;
+                                }
+                                // Write rows
+                                for (int r = 0; r < GridView.Rows.Count; r++)
+                                {
+                                    for (int c = 0; c < GridView.Columns.Count; c++)
+                                    {
+                                        worksheet.Cells[r + 2, c + 1].Value = GridView.Rows[r].Cells[c].Value;
+                                    }
+                                }
+                                package.SaveAs(new FileInfo(sfd.FileName));
+                            }
+                        }
+                        MessageBox.Show("Export completed successfully!", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Export failed:\n" + ex.Message, "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+        }
+
+        private void CancelOrderButton_Click(object sender, EventArgs e)
+        {
+            if (TableBox.SelectedItem.ToString() != "Orders" || GridView.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Please select an order to cancel.");
+                return;
+            }
+
+            var selectedOrder = (Order)GridView.SelectedRows[0].DataBoundItem;
+
+            if (selectedOrder.Status == "Pending" || selectedOrder.Status == "Cancelled")
+            {
+                MessageBox.Show("Please use the Cancel Order button only on completed orders.");
+                return;
+            }
+
+            var confirm = MessageBox.Show("Are you sure you want to cancel this order?", "Confirm", MessageBoxButtons.YesNo);
+            if (confirm != DialogResult.Yes) return;
+
+            using (var context = new DenimContext())
+            {
+                var order = context.Orders
+                    .Include(o => o.OrderDetails)
+                    .FirstOrDefault(o => o.OrderId == selectedOrder.OrderId);
+
+                if (order == null)
+                {
+                    MessageBox.Show("Order not found!");
+                    return;
+                }
+
+                foreach (var detail in order.OrderDetails)
+                {
+                    var product = context.Products.FirstOrDefault(p => p.ProductId == detail.ProductId);
+                    if (product != null)
+                    {
+                        if (order.OrderType == "Sale")
+                        {
+                            product.AmountInStock += detail.Quantity;
+                        }
+                        else if (order.OrderType == "Purchase")
+                        {
+                            product.AmountInStock -= detail.Quantity;
+                        }
+                    }
+                }
+
+                order.Status = "Cancelled";
+                context.SaveChanges();
+            }
+
+            MessageBox.Show("Order cancelled and stock updated.");
+            LoadOrders();
         }
     }
 }

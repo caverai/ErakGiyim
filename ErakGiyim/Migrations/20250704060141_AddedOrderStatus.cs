@@ -5,24 +5,25 @@
 namespace ErakGiyim.Migrations
 {
     /// <inheritdoc />
-    public partial class CapitalLetter : Migration
+    public partial class AddedOrderStatus : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(
-                name: "paid",
+            migrationBuilder.AddColumn<string>(
+                name: "Status",
                 table: "Orders",
-                newName: "Paid");
+                type: "nvarchar(max)",
+                nullable: false,
+                defaultValue: "");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(
-                name: "Paid",
-                table: "Orders",
-                newName: "paid");
+            migrationBuilder.DropColumn(
+                name: "Status",
+                table: "Orders");
         }
     }
 }

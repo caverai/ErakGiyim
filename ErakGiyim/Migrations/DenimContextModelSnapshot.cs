@@ -79,6 +79,10 @@ namespace ErakGiyim.Migrations
                     b.Property<bool>("Paid")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("SupplierId")
                         .HasColumnType("int");
 
@@ -111,6 +115,9 @@ namespace ErakGiyim.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
+                    b.Property<int?>("StorageId")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("UnitPrice")
                         .HasColumnType("decimal(18,2)");
 
@@ -119,6 +126,8 @@ namespace ErakGiyim.Migrations
                     b.HasIndex("OrderId");
 
                     b.HasIndex("ProductId");
+
+                    b.HasIndex("StorageId");
 
                     b.ToTable("OrderDetails");
                 });
@@ -249,9 +258,15 @@ namespace ErakGiyim.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("ErakGiyim.Storage", "Storage")
+                        .WithMany()
+                        .HasForeignKey("StorageId");
+
                     b.Navigation("Order");
 
                     b.Navigation("Product");
+
+                    b.Navigation("Storage");
                 });
 
             modelBuilder.Entity("ErakGiyim.Product", b =>

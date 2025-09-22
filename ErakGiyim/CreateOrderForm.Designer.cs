@@ -41,6 +41,9 @@
             OrderDetailsGridView = new DataGridView();
             OrderDateTextBox = new TextBox();
             OrderDateLabel = new Label();
+            PaidCheckBox = new CheckBox();
+            StatusLabel = new Label();
+            StatusComboBox = new ComboBox();
             ((System.ComponentModel.ISupportInitialize)OrderDetailsGridView).BeginInit();
             SuspendLayout();
             // 
@@ -99,7 +102,7 @@
             // TotalLabel
             // 
             TotalLabel.AutoSize = true;
-            TotalLabel.Location = new Point(12, 146);
+            TotalLabel.Location = new Point(83, 165);
             TotalLabel.Name = "TotalLabel";
             TotalLabel.Size = new Size(36, 15);
             TotalLabel.TabIndex = 6;
@@ -108,7 +111,7 @@
             // TotalAmount
             // 
             TotalAmount.AutoSize = true;
-            TotalAmount.Location = new Point(54, 146);
+            TotalAmount.Location = new Point(119, 165);
             TotalAmount.Name = "TotalAmount";
             TotalAmount.Size = new Size(0, 15);
             TotalAmount.TabIndex = 7;
@@ -138,7 +141,7 @@
             OrderDetailsGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             OrderDetailsGridView.Location = new Point(210, 11);
             OrderDetailsGridView.Name = "OrderDetailsGridView";
-            OrderDetailsGridView.Size = new Size(463, 238);
+            OrderDetailsGridView.Size = new Size(603, 238);
             OrderDetailsGridView.TabIndex = 10;
             OrderDetailsGridView.CellValueChanged += OrderDetailsGridView_CellValueChanged;
             // 
@@ -158,11 +161,42 @@
             OrderDateLabel.TabIndex = 12;
             OrderDateLabel.Text = "Order Date";
             // 
+            // PaidCheckBox
+            // 
+            PaidCheckBox.AutoSize = true;
+            PaidCheckBox.CheckAlign = ContentAlignment.MiddleRight;
+            PaidCheckBox.Location = new Point(13, 164);
+            PaidCheckBox.Name = "PaidCheckBox";
+            PaidCheckBox.Size = new Size(49, 19);
+            PaidCheckBox.TabIndex = 14;
+            PaidCheckBox.Text = "Paid";
+            PaidCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // StatusLabel
+            // 
+            StatusLabel.AutoSize = true;
+            StatusLabel.Location = new Point(12, 131);
+            StatusLabel.Name = "StatusLabel";
+            StatusLabel.Size = new Size(39, 15);
+            StatusLabel.TabIndex = 15;
+            StatusLabel.Text = "Status";
+            // 
+            // StatusComboBox
+            // 
+            StatusComboBox.FormattingEnabled = true;
+            StatusComboBox.Location = new Point(83, 128);
+            StatusComboBox.Name = "StatusComboBox";
+            StatusComboBox.Size = new Size(121, 23);
+            StatusComboBox.TabIndex = 16;
+            // 
             // CreateOrderForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(685, 261);
+            ClientSize = new Size(825, 261);
+            Controls.Add(StatusComboBox);
+            Controls.Add(StatusLabel);
+            Controls.Add(PaidCheckBox);
             Controls.Add(OrderDateLabel);
             Controls.Add(OrderDateTextBox);
             Controls.Add(OrderDetailsGridView);
@@ -199,5 +233,8 @@
         private DataGridView OrderDetailsGridView;
         private TextBox OrderDateTextBox;
         private Label OrderDateLabel;
+        private CheckBox PaidCheckBox;
+        private Label StatusLabel;
+        private ComboBox StatusComboBox;
     }
 }

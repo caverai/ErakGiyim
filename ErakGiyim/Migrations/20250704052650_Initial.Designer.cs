@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ErakGiyim.Migrations
 {
     [DbContext(typeof(DenimContext))]
-    [Migration("20250623074009_nullableStorage")]
-    partial class nullableStorage
+    [Migration("20250704052650_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -79,14 +79,14 @@ namespace ErakGiyim.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("Paid")
+                        .HasColumnType("bit");
+
                     b.Property<int?>("SupplierId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<bool>("paid")
-                        .HasColumnType("bit");
 
                     b.HasKey("OrderId");
 
@@ -114,7 +114,10 @@ namespace ErakGiyim.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("unitPrice")
+                    b.Property<int?>("StorageId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("UnitPrice")
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("OrderDetailId");
@@ -122,6 +125,8 @@ namespace ErakGiyim.Migrations
                     b.HasIndex("OrderId");
 
                     b.HasIndex("ProductId");
+
+                    b.HasIndex("StorageId");
 
                     b.ToTable("OrderDetails");
                 });
@@ -252,9 +257,15 @@ namespace ErakGiyim.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("ErakGiyim.Storage", "Storage")
+                        .WithMany()
+                        .HasForeignKey("StorageId");
+
                     b.Navigation("Order");
 
                     b.Navigation("Product");
+
+                    b.Navigation("Storage");
                 });
 
             modelBuilder.Entity("ErakGiyim.Product", b =>

@@ -15,7 +15,6 @@ public class DenimContext : DbContext
     public DbSet<Storage> Storages { get; set; }
     public DbSet<Supplier> Suppliers { get; set; }
 
-    // Set up your database connection here
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseSqlServer("Server=localhost;Database=DenimDb;Trusted_Connection=True;Encrypt=False;");

@@ -20,5 +20,8 @@ namespace ErakGiyim
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
         public decimal Subtotal => Quantity * UnitPrice;
+
+        public int? StorageId { get; set; }
+        public Storage? Storage { get; set; }
     }
 }
